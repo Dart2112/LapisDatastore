@@ -9,7 +9,7 @@ public abstract class DataStore {
 
     LapisCorePlugin core;
 
-    public DataStore(LapisCorePlugin core){
+    public DataStore(LapisCorePlugin core) {
         this.core = core;
     }
 
@@ -42,7 +42,7 @@ public abstract class DataStore {
     protected abstract void dropTable(String tableName);
 
     public enum StorageType {
-        MySQL, H2, Yaml;
+        MySQL, H2, SQLite
     }
 
 }
