@@ -50,6 +50,7 @@ public abstract class MySQL extends DataStore {
 
     void getConnection(boolean includeDatabase) {
         try {
+            closeConnection();
             conn = DriverManager.getConnection(url.getURLString(StorageType.MySQL, includeDatabase), username, password);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,12 +68,12 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public void addData(String tableName, String valueNames, String values) {
+    public void addData(Table table, String values) {
         Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
             try {
                 getConnection(true);
-                String valuesQuery = getQuery(valueNames);
-                String sql = "INSERT INTO " + tableName + "(" + valueNames + ") VALUES(" + valuesQuery + ")";
+                String valuesQuery = getQuery(table.getCommaSeparatedValues());
+                String sql = "INSERT INTO " + table.getName() + "(" + table.getCommaSeparatedValues() + ") VALUES(" + valuesQuery + ")";
                 PreparedStatement preStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 int i = 1;
                 for (String s : values.split("#")) {
@@ -90,11 +91,11 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public void setData(String tableName, String primaryKey, String primaryValue, String key, String value) {
+    public void setData(Table table, String primaryKey, String primaryValue, String key, String value) {
         Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
             try {
                 getConnection(true);
-                String sqlUpdate = "UPDATE " + tableName + " SET " + key + " = ? WHERE " + primaryKey + " = ?";
+                String sqlUpdate = "UPDATE " + table.getName() + " SET " + key + " = ? WHERE " + primaryKey + " = ?";
                 PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
                 preStatement.setString(1, value);
                 preStatement.setString(2, primaryValue);
@@ -109,8 +110,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public Long getLong(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public Long getLong(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         if (incrementIfValid(rs)) {
             try {
                 return rs.getLong(key);
@@ -124,8 +125,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public String getString(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public String getString(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         if (incrementIfValid(rs)) {
             try {
                 return rs.getString(key);
@@ -139,8 +140,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public Boolean getBoolean(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public Boolean getBoolean(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         if (incrementIfValid(rs)) {
             try {
                 return rs.getInt(key) == 1;
@@ -154,8 +155,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public Object getObject(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public Object getObject(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         if (incrementIfValid(rs)) {
             try {
                 return rs.getObject(key);
@@ -169,8 +170,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public List<Long> getLongList(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public List<Long> getLongList(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         List<Long> list = new ArrayList<>();
         try {
             while (incrementIfValid(rs)) {
@@ -185,8 +186,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public List<String> getStringList(String tableName, String primaryKey, String value, String key) {
-        ResultSet rs = getResults(tableName, primaryKey, value);
+    public List<String> getStringList(Table table, String primaryKey, String value, String key) {
+        ResultSet rs = getResults(table, primaryKey, value);
         List<String> list = new ArrayList<>();
         try {
             while (incrementIfValid(rs)) {
@@ -201,8 +202,8 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public List<String> getEntireColumn(String tableName, String key) {
-        ResultSet rs = getEntireTable(tableName);
+    public List<String> getEntireColumn(Table table, String key) {
+        ResultSet rs = getEntireTableAsResultSet(table);
         List<String> list = new ArrayList<>();
         try {
             while (incrementIfValid(rs)) {
@@ -217,11 +218,11 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    public void removeData(String tableName, String key, String value) {
+    public void removeData(Table table, String key, String value) {
         Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
             try {
                 getConnection(true);
-                String sqlUpdate = "DELETE FROM " + tableName + " WHERE " + key + " = ?";
+                String sqlUpdate = "DELETE FROM " + table.getName() + " WHERE " + key + " = ?";
                 PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
                 preStatement.setString(1, value);
                 preStatement.execute();
@@ -235,11 +236,11 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
-    protected void dropTable(String tableName) {
+    protected void dropTable(Table table) {
         Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
             try {
                 getConnection(true);
-                String sqlUpdate = "DROP TABLE " + tableName;
+                String sqlUpdate = "DROP TABLE " + table.getName();
                 Statement stmt = conn.createStatement();
                 stmt.execute(sqlUpdate);
                 stmt.close();
@@ -251,10 +252,29 @@ public abstract class MySQL extends DataStore {
         });
     }
 
-    private ResultSet getResults(String tableName, String primaryKey, String value) {
+    @Override
+    public List<String> getEntireTable(Table table) {
+        List<String> list = new ArrayList<>();
+        ResultSet rs = getEntireTableAsResultSet(table);
+        while (incrementIfValid(rs)) {
+            try {
+                StringBuilder entry = new StringBuilder();
+                for (String columnName : table.getValues()) {
+                    entry.append(rs.getString(columnName)).append(",");
+                }
+                entry = new StringBuilder(entry.substring(0, entry.length() - 1));
+                list.add(entry.toString());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    private ResultSet getResults(Table table, String primaryKey, String value) {
         try {
             getConnection(true);
-            String sqlUpdate = "SELECT * FROM " + tableName + " WHERE " + primaryKey + " = ?";
+            String sqlUpdate = "SELECT * FROM " + table.getName() + " WHERE " + primaryKey + " = ?";
             PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
             preStatement.setString(1, value);
             return preStatement.executeQuery();
@@ -264,11 +284,11 @@ public abstract class MySQL extends DataStore {
         return null;
     }
 
-    private ResultSet getEntireTable(String table) {
+    private ResultSet getEntireTableAsResultSet(Table table) {
         try {
             getConnection(true);
             Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM " + table;
+            String sql = "SELECT * FROM " + table.getName();
             return stmt.executeQuery(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -298,7 +318,7 @@ public abstract class MySQL extends DataStore {
         return true;
     }
 
-    public abstract void createTables(Connection conn) throws SQLException;
+    abstract void createTables(Connection conn) throws SQLException;
 
     private String getQuery(String values) {
         StringBuilder query = new StringBuilder();
