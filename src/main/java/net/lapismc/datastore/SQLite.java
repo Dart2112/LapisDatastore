@@ -12,7 +12,7 @@ public abstract class SQLite extends MySQL {
 
     private LapisURL url;
 
-    SQLite(LapisCorePlugin core, LapisURL url) {
+    public SQLite(LapisCorePlugin core, LapisURL url) {
         super(core);
         this.url = url;
         try {

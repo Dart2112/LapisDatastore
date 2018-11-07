@@ -6,6 +6,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@SuppressWarnings("WeakerAccess")
 public class LapisURL {
 
     private String location, database;
@@ -42,7 +43,7 @@ public class LapisURL {
             case H2:
                 return new File(location + ".mv.db");
             case SQLite:
-                return new File(location);
+                return new File(location + ".db");
         }
         return null;
     }
@@ -67,6 +68,8 @@ public class LapisURL {
             case H2:
                 url = url + "TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0;";
                 break;
+            case SQLite:
+                url = url + ".db";
         }
         return url;
     }

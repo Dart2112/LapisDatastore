@@ -1,17 +1,12 @@
 package net.lapismc.datastore.util;
 
+@SuppressWarnings("unused")
 public class URLBuilder {
 
-    private String protocol;
     private String location;
     private Integer port;
     private String database;
     private Boolean useSSL;
-
-    public URLBuilder setProtocol(String protocol) {
-        this.protocol = protocol;
-        return this;
-    }
 
     public URLBuilder setLocation(String location) {
         this.location = location;

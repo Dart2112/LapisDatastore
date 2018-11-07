@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class MySQL extends DataStore {
 
     Connection conn;
@@ -36,8 +36,6 @@ public abstract class MySQL extends DataStore {
         try {
             getConnection(false);
             createTables(conn);
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             closeConnection();
         }
@@ -189,15 +187,7 @@ public abstract class MySQL extends DataStore {
     public List<String> getStringList(Table table, String primaryKey, String value, String key) {
         ResultSet rs = getResults(table, primaryKey, value);
         List<String> list = new ArrayList<>();
-        try {
-            while (incrementIfValid(rs)) {
-                list.add(rs.getString(key));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            closeConnection();
-        }
+        getStringListFromResultSet(key, rs, list);
         return list;
     }
 
@@ -205,6 +195,11 @@ public abstract class MySQL extends DataStore {
     public List<String> getEntireColumn(Table table, String key) {
         ResultSet rs = getEntireTableAsResultSet(table);
         List<String> list = new ArrayList<>();
+        getStringListFromResultSet(key, rs, list);
+        return list;
+    }
+
+    private void getStringListFromResultSet(String key, ResultSet rs, List<String> list) {
         try {
             while (incrementIfValid(rs)) {
                 list.add(rs.getString(key));
@@ -214,7 +209,6 @@ public abstract class MySQL extends DataStore {
         } finally {
             closeConnection();
         }
-        return list;
     }
 
     @Override
@@ -318,7 +312,7 @@ public abstract class MySQL extends DataStore {
         return true;
     }
 
-    abstract void createTables(Connection conn) throws SQLException;
+    public abstract void createTables(Connection conn);
 
     private String getQuery(String values) {
         StringBuilder query = new StringBuilder();
