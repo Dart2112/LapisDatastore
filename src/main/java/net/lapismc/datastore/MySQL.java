@@ -1,5 +1,6 @@
 package net.lapismc.datastore;
 
+import net.lapismc.datastore.util.ConnectionManager;
 import net.lapismc.datastore.util.LapisURL;
 import net.lapismc.lapiscore.LapisCorePlugin;
 import org.bukkit.Bukkit;
@@ -12,6 +13,7 @@ import java.util.List;
 public abstract class MySQL extends DataStore {
 
     Connection conn;
+    ConnectionManager connectionManager;
     private LapisURL url;
     private String username, password;
 
@@ -24,11 +26,12 @@ public abstract class MySQL extends DataStore {
         this.url = url;
         this.username = username;
         this.password = password;
-        try {
+        connectionManager = new ConnectionManager(url, getStorageType(), username, password);
+        /*try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -49,7 +52,11 @@ public abstract class MySQL extends DataStore {
     void getConnection(boolean includeDatabase) {
         try {
             closeConnection();
-            conn = DriverManager.getConnection(url.getURLString(StorageType.MySQL, includeDatabase), username, password);
+            if (!includeDatabase) {
+                conn = DriverManager.getConnection(url.getURLString(StorageType.MySQL, false), username, password);
+            } else {
+                conn = connectionManager.getConnection();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

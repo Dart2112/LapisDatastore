@@ -1,11 +1,11 @@
 package net.lapismc.datastore;
 
+import net.lapismc.datastore.util.ConnectionManager;
 import net.lapismc.datastore.util.LapisURL;
 import net.lapismc.lapiscore.LapisCorePlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public abstract class SQLite extends MySQL {
@@ -15,11 +15,12 @@ public abstract class SQLite extends MySQL {
     public SQLite(LapisCorePlugin core, LapisURL url) {
         super(core);
         this.url = url;
-        try {
+        connectionManager = new ConnectionManager(url, getStorageType(), "", "");
+        /*try {
             Class.forName("org.sqlite.JDBC").newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -43,7 +44,7 @@ public abstract class SQLite extends MySQL {
     @Override
     void getConnection(boolean includeDatabase) {
         try {
-            conn = DriverManager.getConnection(url.getURLString(StorageType.SQLite, false));
+            conn = connectionManager.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
         }
