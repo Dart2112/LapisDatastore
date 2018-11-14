@@ -3,10 +3,10 @@ package net.lapismc.datastore.util;
 @SuppressWarnings("unused")
 public class URLBuilder {
 
-    private String location;
-    private Integer port;
-    private String database;
-    private Boolean useSSL;
+    private String location = null;
+    private Integer port = null;
+    private String database = null;
+    private Boolean useSSL = true;
 
     public URLBuilder setLocation(String location) {
         this.location = location;

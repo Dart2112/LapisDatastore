@@ -26,7 +26,7 @@ public abstract class MySQL extends DataStore {
         this.url = url;
         this.username = username;
         this.password = password;
-        connectionManager = new ConnectionManager(url, getStorageType(), username, password);
+        connectionManager = new ConnectionManager(url, getStorageType(), "com.mysql.jdbc.jdbc2.optional.MysqlDataSource", username, password);
         /*try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
@@ -52,8 +52,8 @@ public abstract class MySQL extends DataStore {
     void getConnection(boolean includeDatabase) {
         try {
             closeConnection();
-            if (!includeDatabase) {
-                conn = DriverManager.getConnection(url.getURLString(StorageType.MySQL, false), username, password);
+            if (includeDatabase) {
+                conn = DriverManager.getConnection(url.getURL(StorageType.MySQL, true), username, password);
             } else {
                 conn = connectionManager.getConnection();
             }
@@ -70,6 +70,12 @@ public abstract class MySQL extends DataStore {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void shutdown() {
+        closeConnection();
+        connectionManager.shutdown();
     }
 
     @Override

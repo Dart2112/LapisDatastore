@@ -3,8 +3,6 @@ package net.lapismc.datastore.util;
 import net.lapismc.datastore.DataStore;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @SuppressWarnings("WeakerAccess")
 public class LapisURL {
@@ -20,22 +18,13 @@ public class LapisURL {
         this.useSSL = useSSL;
     }
 
-    public URL getURL(DataStore.StorageType type, boolean includeDatabase) {
-        try {
-            String url = getProtocol(type) + location + (port != null ? ":" + port : "");
-            return new URL(appendForType(type, url, includeDatabase));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public String getURL(DataStore.StorageType type, boolean includeDatabase) {
+        String url = getProtocol(type) + location + (port != null ? ":" + port : "");
+        return appendForType(type, url, includeDatabase);
     }
 
-    public URL getURL(DataStore.StorageType type) {
+    public String getURL(DataStore.StorageType type) {
         return getURL(type, true);
-    }
-
-    public String getURLString(DataStore.StorageType type, boolean includeDatabase) {
-        return getURL(type, includeDatabase).toString();
     }
 
     public File getFile(DataStore.StorageType type) {
@@ -66,7 +55,7 @@ public class LapisURL {
                 url = url + (includeDatabase ? "/" + database : "") + (useSSL ? "?verifyServerCertificate=false&useSSL=true" : "?useSSL=false");
                 break;
             case H2:
-                url = url + "TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0;";
+                url = url + ";TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0;";
                 break;
             case SQLite:
                 url = url + ".db";

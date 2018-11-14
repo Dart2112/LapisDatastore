@@ -15,7 +15,7 @@ public abstract class SQLite extends MySQL {
     public SQLite(LapisCorePlugin core, LapisURL url) {
         super(core);
         this.url = url;
-        connectionManager = new ConnectionManager(url, getStorageType(), "", "");
+        connectionManager = new ConnectionManager(url, StorageType.SQLite, "org.sqlite.JDBC", "", "");
         /*try {
             Class.forName("org.sqlite.JDBC").newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
@@ -45,6 +45,7 @@ public abstract class SQLite extends MySQL {
     void getConnection(boolean includeDatabase) {
         try {
             conn = connectionManager.getConnection();
+            //conn = DriverManager.getConnection(url.getURL(getStorageType(), false));
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -20,6 +20,8 @@ public abstract class DataStore {
 
     public abstract void closeConnection();
 
+    public abstract void shutdown();
+
     public abstract void addData(Table table, String values);
 
     public abstract void setData(Table table, String primaryKey, String primaryValue, String key, String value);
