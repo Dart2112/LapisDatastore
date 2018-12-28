@@ -1,11 +1,12 @@
 package net.lapismc.datastore;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class Table {
+public abstract class Table {
 
     private String name;
     private List<String> values;
@@ -14,6 +15,8 @@ public class Table {
         this.name = name;
         this.values = new ArrayList<>(Arrays.asList(values));
     }
+
+    public abstract void createTable(Connection conn);
 
     public String getName() {
         return name;

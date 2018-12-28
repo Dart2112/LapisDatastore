@@ -1,12 +1,12 @@
 package net.lapismc.datastore;
 
-import net.lapismc.datastore.util.ConnectionManager;
 import net.lapismc.datastore.util.LapisURL;
 import net.lapismc.lapiscore.LapisCorePlugin;
 import org.h2.Driver;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public abstract class H2 extends MySQL {
@@ -15,8 +15,8 @@ public abstract class H2 extends MySQL {
 
     public H2(LapisCorePlugin core, LapisURL url) {
         super(core);
+        Driver.load();
         this.url = url;
-        connectionManager = new ConnectionManager(url, getStorageType(), Driver.class.getName(), "", "");
     }
 
     @Override
@@ -40,8 +40,7 @@ public abstract class H2 extends MySQL {
     @Override
     void getConnection(boolean includeDatabase) {
         try {
-            conn = connectionManager.getConnection();
-            //conn = DriverManager.getConnection(url.getURL(getStorageType(), false));
+            conn = DriverManager.getConnection(url.getURL(getStorageType(), false));
         } catch (SQLException e) {
             e.printStackTrace();
         }

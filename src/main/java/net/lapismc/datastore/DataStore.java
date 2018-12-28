@@ -9,6 +9,8 @@ import java.util.List;
 public abstract class DataStore {
 
     LapisCorePlugin core;
+    @SuppressWarnings("WeakerAccess")
+    public String valueSeparator = "º";
 
     DataStore(LapisCorePlugin core) {
         this.core = core;

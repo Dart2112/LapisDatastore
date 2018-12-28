@@ -26,7 +26,7 @@ public abstract class MySQL extends DataStore {
         this.url = url;
         this.username = username;
         this.password = password;
-        connectionManager = new ConnectionManager(url, getStorageType(), "com.mysql.jdbc.jdbc2.optional.MysqlDataSource", username, password);
+        connectionManager = new ConnectionManager(core, url, getStorageType(), username, password);
         /*try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
@@ -75,7 +75,8 @@ public abstract class MySQL extends DataStore {
     @Override
     public void shutdown() {
         closeConnection();
-        connectionManager.shutdown();
+        if (connectionManager != null)
+            connectionManager.shutdown();
     }
 
     @Override
@@ -87,7 +88,7 @@ public abstract class MySQL extends DataStore {
                 String sql = "INSERT INTO " + table.getName() + "(" + table.getCommaSeparatedValues() + ") VALUES(" + valuesQuery + ")";
                 PreparedStatement preStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 int i = 1;
-                for (String s : values.split("#")) {
+                for (String s : values.split(valueSeparator)) {
                     preStatement.setString(i, s);
                     i++;
                 }
