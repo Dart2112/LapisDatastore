@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -77,6 +78,43 @@ public abstract class MySQL extends DataStore {
         closeConnection();
         if (connectionManager != null)
             connectionManager.shutdown();
+    }
+
+    @Override
+    public void addData(Table table, String primaryKey, String primaryValue, String values) {
+        if (primaryValue.equals(getString(table, primaryKey, primaryValue, primaryKey))) {
+            Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+                //The data exists so we just update it with the following query
+                //update TABLE set column1='value',column2='value',column3='value' where primaryKey='primaryValue'
+                StringBuilder query = new StringBuilder("update " + table.getName() + " set ");
+                //Get lists of the columns and the desired values
+                List<String> columnNames = table.getValues();
+                List<String> valuesList = Arrays.asList(values.split(valueSeparator));
+                //Loop through and generate the query
+                for (int i = 0; i < columnNames.size(); i++) {
+                    query.append(columnNames.get(i)).append("='").append(valuesList.get(i)).append("',");
+                }
+                //Remove the final comma
+                query.deleteCharAt(query.length() - 1);
+                //Append the rest of the command
+                query.append(" where ").append(primaryKey).append("='").append(primaryValue).append("'");
+                try {
+                    //Execute
+                    getConnection(true);
+                    Statement stmt = conn.createStatement();
+                    stmt.execute(query.toString());
+                    //Clean up
+                    stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    closeConnection();
+                }
+            });
+        } else {
+            //The data doesn't exist so we add it
+            addData(table, values);
+        }
     }
 
     @Override
@@ -268,9 +306,10 @@ public abstract class MySQL extends DataStore {
             try {
                 StringBuilder entry = new StringBuilder();
                 for (String columnName : table.getValues()) {
-                    entry.append(rs.getString(columnName)).append(",");
+                    entry.append(rs.getString(columnName)).append(valueSeparator);
                 }
-                entry = new StringBuilder(entry.substring(0, entry.length() - 1));
+                if (entry.length() > 1)
+                    entry.deleteCharAt(entry.length() - 1);
                 list.add(entry.toString());
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -312,7 +351,7 @@ public abstract class MySQL extends DataStore {
             if (rs.isClosed()) {
                 return false;
             }
-            if (!rs.isBeforeFirst()) {
+            if (rs.isAfterLast()) {
                 return false;
             }
             try {
@@ -322,8 +361,8 @@ public abstract class MySQL extends DataStore {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return true;
     }
 
     public abstract void createTables(Connection conn);

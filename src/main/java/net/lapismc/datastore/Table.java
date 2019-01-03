@@ -29,8 +29,10 @@ public abstract class Table {
     public String getCommaSeparatedValues() {
         StringBuilder s = new StringBuilder();
         for (String value : values) {
-            s.append(value);
+            s.append(value).append(",");
         }
+        if (s.length() > 1)
+            s.deleteCharAt(s.length() - 1);
         return s.toString();
     }
 
