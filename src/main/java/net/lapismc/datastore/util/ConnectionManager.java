@@ -23,6 +23,8 @@ public class ConnectionManager {
         config.setMaxLifetime(TimeUnit.MINUTES.toMillis(1));
         config.setDriverClassName(getDriverClass(type));
         config.setJdbcUrl(url.getURL(type));
+        config.setUsername(username);
+        config.setPassword(password);
 
         ds = new HikariDataSource(config);
         ds.setUsername(username);
