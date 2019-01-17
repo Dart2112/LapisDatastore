@@ -40,7 +40,7 @@ public class LapisURL {
     private String getProtocol(DataStore.StorageType type) {
         switch (type) {
             case MySQL:
-                return "jdbc:mysql:";
+                return "jdbc:mysql://";
             case H2:
                 return "jdbc:h2:";
             case SQLite:
