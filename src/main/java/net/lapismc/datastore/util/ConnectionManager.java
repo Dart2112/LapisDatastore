@@ -13,22 +13,29 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionManager {
 
     private HikariDataSource ds;
+    private HikariConfig config;
+    private HikariDataSource noDB;
 
     public ConnectionManager(LapisCorePlugin core, LapisURL url, DataStore.StorageType type, String username, String password) {
-        HikariConfig config = new HikariConfig();
+        config = new HikariConfig();
         config.setPoolName(core.getName() + "-hikari");
+
+
+        //Different datasource for accessing the server without the db
+        config.setMaximumPoolSize(2);
+        config.setMinimumIdle(1);
+        config.setMaxLifetime(TimeUnit.MINUTES.toMillis(1));
+        config.setDriverClassName(getDriverClass(type));
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setJdbcUrl(url.getURL(type, false));
+        noDB = new HikariDataSource(config);
 
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(2);
-        config.setMaxLifetime(TimeUnit.MINUTES.toMillis(1));
-        config.setDriverClassName(getDriverClass(type));
-        config.setJdbcUrl(url.getURL(type));
-        config.setUsername(username);
-        config.setPassword(password);
-
-        ds = new HikariDataSource(config);
-        ds.setUsername(username);
-        ds.setPassword(password);
+        config.setJdbcUrl(url.getURL(type, true));
+        if (!type.equals(DataStore.StorageType.MySQL))
+            ds = new HikariDataSource(config);
     }
 
     private String getDriverClass(DataStore.StorageType type) {
@@ -43,8 +50,15 @@ public class ConnectionManager {
         return "";
     }
 
-    public Connection getConnection() throws SQLException {
-        return ds.getConnection();
+    public Connection getConnection(boolean includeDatabase) throws SQLException {
+        if (includeDatabase) {
+            if (ds == null) {
+                ds = new HikariDataSource(config);
+            }
+            return ds.getConnection();
+        } else {
+            return noDB.getConnection();
+        }
     }
 
     public void shutdown() {

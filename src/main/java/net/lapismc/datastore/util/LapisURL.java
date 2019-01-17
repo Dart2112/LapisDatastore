@@ -4,7 +4,6 @@ import net.lapismc.datastore.DataStore;
 
 import java.io.File;
 
-@SuppressWarnings("WeakerAccess")
 public class LapisURL {
 
     private String location, database;
@@ -23,10 +22,6 @@ public class LapisURL {
         return appendForType(type, url, includeDatabase);
     }
 
-    public String getURL(DataStore.StorageType type) {
-        return getURL(type, true);
-    }
-
     public File getFile(DataStore.StorageType type) {
         switch (type) {
             case H2:
@@ -35,6 +30,10 @@ public class LapisURL {
                 return new File(location + ".db");
         }
         return null;
+    }
+
+    public String getDatabase() {
+        return database;
     }
 
     private String getProtocol(DataStore.StorageType type) {

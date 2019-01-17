@@ -15,8 +15,7 @@ public abstract class MySQL extends DataStore {
 
     Connection conn;
     ConnectionManager connectionManager;
-    private LapisURL url;
-    private String username, password;
+    LapisURL url;
 
     MySQL(LapisCorePlugin core) {
         super(core);
@@ -25,20 +24,15 @@ public abstract class MySQL extends DataStore {
     public MySQL(LapisCorePlugin core, LapisURL url, String username, String password) {
         super(core);
         this.url = url;
-        this.username = username;
-        this.password = password;
         connectionManager = new ConnectionManager(core, url, getStorageType(), username, password);
-        /*try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
     public void initialiseDataStore() {
         try {
             getConnection(false);
+            createDatabase();
+            getConnection(true);
             createTables(conn);
         } finally {
             closeConnection();
@@ -53,11 +47,7 @@ public abstract class MySQL extends DataStore {
     void getConnection(boolean includeDatabase) {
         try {
             closeConnection();
-            if (includeDatabase) {
-                conn = DriverManager.getConnection(url.getURL(StorageType.MySQL, true), username, password);
-            } else {
-                conn = connectionManager.getConnection();
-            }
+            conn = connectionManager.getConnection(includeDatabase);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -78,6 +68,19 @@ public abstract class MySQL extends DataStore {
         closeConnection();
         if (connectionManager != null)
             connectionManager.shutdown();
+    }
+
+    public void createDatabase() {
+        if (getStorageType().equals(StorageType.MySQL)) {
+            try {
+                Statement stmt = conn.createStatement();
+                stmt.execute("CREATE DATABASE IF NOT EXISTS " + url.getDatabase() + ";");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                closeConnection();
+            }
+        }
     }
 
     @Override
