@@ -80,7 +80,7 @@ public abstract class DataStore {
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns a Long if the data is found or Null if not
+     * @return Returns a long if the data is found or Null if not
      */
     public abstract Long getLong(Table table, String primaryKey, String value, String key);
 
@@ -91,7 +91,7 @@ public abstract class DataStore {
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns a String if the data is found or Null if not
+     * @return Returns a string if the data is found or Null if not
      */
     public abstract String getString(Table table, String primaryKey, String value, String key);
 
@@ -102,7 +102,7 @@ public abstract class DataStore {
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns a Boolean if the data is found or Null if not
+     * @return Returns a boolean if the data is found or Null if not
      */
     public abstract Boolean getBoolean(Table table, String primaryKey, String value, String key);
 
@@ -113,29 +113,29 @@ public abstract class DataStore {
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns an Object if the data is found or Null if not
+     * @return Returns an object if the data is found or Null if not
      */
     public abstract Object getObject(Table table, String primaryKey, String value, String key);
 
     /**
-     * Get a List of the type List<Long>, use a non unique primary key and value to get multiple values returned
+     * Get a list of long, use a non unique primary key and value to get multiple values returned
      *
      * @param table      The table you wish to access
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns a List<Long> if the data is found or Null if not
+     * @return Returns a list of long if the data is found or Null if not
      */
     public abstract List<Long> getLongList(Table table, String primaryKey, String value, String key);
 
     /**
-     * Get a List of the type List<String>, use a non unique primary key and value to get multiple values returned
+     * Get a list of strings, use a non unique primary key and value to get multiple values returned
      *
      * @param table      The table you wish to access
      * @param primaryKey The primary key of the row you wish to access
      * @param value      The value of the primary key in the row you wish to access
      * @param key        The key to the value you wish to access
-     * @return Returns a List<String> if the data is found or Null if not
+     * @return Returns a list of string if the data is found or Null if not
      */
     public abstract List<String> getStringList(Table table, String primaryKey, String value, String key);
 
@@ -144,7 +144,7 @@ public abstract class DataStore {
      *
      * @param table The table you wish to access
      * @param key   The column you wish to receive values from
-     * @return Returns a List<String> of all the values in the column
+     * @return Returns a list of string of all the values in the column
      */
     public abstract List<String> getEntireColumn(Table table, String key);
 
