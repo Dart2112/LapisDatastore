@@ -109,7 +109,10 @@ public abstract class MySQL extends DataStore {
                     //Clean up
                     stmt.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    core.getLogger().warning("An error occurred adding data to the database for " + core.getName()
+                            + ", Sometimes this is a false alarm, other times the data might not have been set." +
+                            "If you experience errors, please report them with the following line.");
+                    core.getLogger().warning(e.getMessage());
                 } finally {
                     closeConnection();
                 }
