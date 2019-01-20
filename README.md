@@ -2,9 +2,8 @@
 
 This is an API for interfacing with SQL databases
 
-
 ## Getting the API
-The LapisDataStore is on Maven Central.
+LapisDataStore is on Maven Central.
 Simply use the LapisDataStore dependency and Maven will fetch the API
 
 ```
