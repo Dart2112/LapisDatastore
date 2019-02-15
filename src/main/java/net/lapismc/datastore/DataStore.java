@@ -149,6 +149,16 @@ public abstract class DataStore {
     public abstract List<String> getEntireColumn(Table table, String key);
 
     /**
+     * Returns a list of String that contains all the values in a row that matches the primary key and value
+     *
+     * @param table      The table you wish to access
+     * @param primaryKey The primary value of the row you wish to access
+     * @param value      The value of the primary key in the row you wish to access
+     * @return Returns the first row that matches the criteria, an empty list if no row is found
+     */
+    public abstract List<String> getEntireRow(Table table, String primaryKey, String value);
+
+    /**
      * Get a list of all rows in a table, the values are separated with {@link #valueSeparator}
      *
      * @param table The table you wish to retrieve

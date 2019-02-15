@@ -257,6 +257,30 @@ public abstract class MySQL extends DataStore {
         return list;
     }
 
+    @Override
+    public List<String> getEntireRow(Table table, String primaryKey, String value) {
+        ResultSet rs = getEntireTableAsResultSet(table);
+        List<String> list = new ArrayList<>();
+        try {
+            ResultSetMetaData resultSetMetaData = rs.getMetaData();
+            int columnCount = resultSetMetaData.getColumnCount();
+            //loop over each row in the table
+            while (incrementIfValid(rs)) {
+                //Find one that matches the criteria
+                if (rs.getString(primaryKey).equals(value)) {
+                    //Loop over each column in the table and add its value
+                    for (int i = 1; i <= columnCount; i++) {
+                        list.add(rs.getString(i));
+                    }
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private void getStringListFromResultSet(String key, ResultSet rs, List<String> list) {
         try {
             while (incrementIfValid(rs)) {
