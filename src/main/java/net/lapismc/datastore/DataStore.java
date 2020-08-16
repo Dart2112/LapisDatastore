@@ -176,6 +176,13 @@ public abstract class DataStore {
     public abstract void removeData(Table table, String key, String value);
 
     /**
+     * Removes all rows from the given table
+     *
+     * @param table the table to truncate
+     */
+    public abstract void removeAllData(Table table);
+
+    /**
      * Drop an entire table
      *
      * @param table The table you wish to drop

@@ -312,6 +312,23 @@ public abstract class MySQL extends DataStore {
     }
 
     @Override
+    public void removeAllData(Table table) {
+        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+            try {
+                getConnection(true);
+                String sqlUpdate = "TRUNCATE " + table.getName();
+                Statement stmt = conn.createStatement();
+                stmt.execute(sqlUpdate);
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                closeConnection();
+            }
+        });
+    }
+
+    @Override
     protected void dropTable(Table table) {
         Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
             try {
@@ -403,6 +420,6 @@ public abstract class MySQL extends DataStore {
         for (String ignored : valuesArray) {
             query.append("?,");
         }
-        return query.toString().substring(0, query.toString().length() - 1);
+        return query.substring(0, query.toString().length() - 1);
     }
 }
