@@ -319,7 +319,7 @@ public abstract class MySQL extends DataStore {
         runTask(() -> {
             try {
                 getConnection(true);
-                String sqlUpdate = "TRUNCATE " + table.getName();
+                String sqlUpdate = "DELETE FROM " + table.getName();
                 Statement stmt = conn.createStatement();
                 stmt.execute(sqlUpdate);
                 stmt.close();
