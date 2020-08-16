@@ -85,8 +85,8 @@ public abstract class MySQL extends DataStore {
 
     @Override
     public void addData(Table table, String primaryKey, String primaryValue, String values) {
-        if (primaryValue.equals(getString(table, primaryKey, primaryValue, primaryKey))) {
-            Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
+            if (primaryValue.equals(getString(table, primaryKey, primaryValue, primaryKey))) {
                 //The data exists so we just update it with the following query
                 //update TABLE set column1='value',column2='value',column3='value' where primaryKey='primaryValue'
                 StringBuilder query = new StringBuilder("update " + table.getName() + " set ");
@@ -116,16 +116,19 @@ public abstract class MySQL extends DataStore {
                 } finally {
                     closeConnection();
                 }
-            });
-        } else {
-            //The data doesn't exist so we add it
-            addData(table, values);
-        }
+            } else {
+                //The data doesn't exist so we add it
+                boolean async = isAsync();
+                setAsync(false);
+                addData(table, values);
+                setAsync(async);
+            }
+        });
     }
 
     @Override
     public void addData(Table table, String values) {
-        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
             try {
                 getConnection(true);
                 String valuesQuery = getQuery(table.getCommaSeparatedValues());
@@ -148,7 +151,7 @@ public abstract class MySQL extends DataStore {
 
     @Override
     public void setData(Table table, String primaryKey, String primaryValue, String key, String value) {
-        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
             try {
                 getConnection(true);
                 String sqlUpdate = "UPDATE " + table.getName() + " SET " + key + " = ? WHERE " + primaryKey + " = ?";
@@ -295,7 +298,7 @@ public abstract class MySQL extends DataStore {
 
     @Override
     public void removeData(Table table, String key, String value) {
-        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
             try {
                 getConnection(true);
                 String sqlUpdate = "DELETE FROM " + table.getName() + " WHERE " + key + " = ?";
@@ -313,7 +316,7 @@ public abstract class MySQL extends DataStore {
 
     @Override
     public void removeAllData(Table table) {
-        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
             try {
                 getConnection(true);
                 String sqlUpdate = "TRUNCATE " + table.getName();
@@ -330,7 +333,7 @@ public abstract class MySQL extends DataStore {
 
     @Override
     protected void dropTable(Table table) {
-        Bukkit.getScheduler().runTaskAsynchronously(core, () -> {
+        runTask(() -> {
             try {
                 getConnection(true);
                 String sqlUpdate = "DROP TABLE " + table.getName();
@@ -412,6 +415,14 @@ public abstract class MySQL extends DataStore {
         }
     }
 
+    private void runTask(Runnable task) {
+        if (isAsync()) {
+            Bukkit.getScheduler().runTaskAsynchronously(core, task);
+        } else {
+            task.run();
+        }
+    }
+
     public abstract void createTables(Connection conn);
 
     private String getQuery(String values) {
@@ -422,4 +433,5 @@ public abstract class MySQL extends DataStore {
         }
         return query.substring(0, query.toString().length() - 1);
     }
+
 }

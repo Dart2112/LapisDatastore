@@ -13,6 +13,7 @@ public abstract class DataStore {
      */
     @SuppressWarnings("WeakerAccess")
     public String valueSeparator = "º";
+    private boolean isAsync = true;
     LapisCorePlugin core;
 
     DataStore(LapisCorePlugin core) {
@@ -30,6 +31,24 @@ public abstract class DataStore {
      * @return Returns the type of this DataStore
      */
     public abstract StorageType getStorageType();
+
+    /**
+     * Check if operations are being done asynchronously
+     *
+     * @return true if operations are async, otherwise false
+     */
+    public boolean isAsync() {
+        return isAsync;
+    }
+
+    /**
+     * Enable or disable async operations
+     *
+     * @param isAsync true means operations will be completed asynchronously
+     */
+    public void setAsync(boolean isAsync) {
+        this.isAsync = isAsync;
+    }
 
     /**
      * Closes any currently open connections to the database
