@@ -49,6 +49,7 @@ dependencies {
 
 shadowJar {
     archiveFileName.set(archivesBaseName + ".jar")
+    exclude 'javax/**'
     relocate("org.h2", "net.lapismc.datastore.drivers.h2")
     relocate("org.sqlite", "net.lapismc.datastore.drivers.sqlite")
     relocate("com.zaxxer", "net.lapismc.datastore.drivers")
