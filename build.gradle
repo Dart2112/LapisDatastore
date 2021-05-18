@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.lapismc:LapisCore:1.8.1'
+    compile 'net.lapismc:LapisCore:1.8.2'
     compile 'com.zaxxer:HikariCP:4.0.3'
     compile 'com.h2database:h2:1.4.200'
     compile 'org.xerial:sqlite-jdbc:3.34.0'
