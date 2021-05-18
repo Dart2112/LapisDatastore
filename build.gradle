@@ -26,8 +26,8 @@ group = 'net.lapismc'
 archivesBaseName = "LapisDataStore"
 version = '1.2.0'
 description = 'An API for interfacing with SQL databases'
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 repositories {
     mavenCentral()
@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.lapismc:LapisCore:1.8.0'
+    compile 'net.lapismc:LapisCore:1.8.1'
     compile 'com.zaxxer:HikariCP:4.0.3'
     compile 'com.h2database:h2:1.4.200'
     compile 'org.xerial:sqlite-jdbc:3.34.0'
