@@ -1,7 +1,7 @@
 package net.lapismc.datastore;
 
 import net.lapismc.datastore.util.LapisURL;
-import net.lapismc.lapiscore.LapisCorePlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.h2.Driver;
 
 import java.io.File;
@@ -11,9 +11,9 @@ import java.sql.SQLException;
 
 public abstract class H2 extends MySQL {
 
-    private LapisURL url;
+    private final LapisURL url;
 
-    public H2(LapisCorePlugin core, LapisURL url) {
+    public H2(JavaPlugin core, LapisURL url) {
         super(core);
         Driver.load();
         this.url = url;

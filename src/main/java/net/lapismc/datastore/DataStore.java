@@ -1,7 +1,7 @@
 package net.lapismc.datastore;
 
-import net.lapismc.lapiscore.LapisCorePlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ public abstract class DataStore {
     @SuppressWarnings("WeakerAccess")
     public String valueSeparator = "º";
     private boolean isAsync = true;
-    LapisCorePlugin core;
+    JavaPlugin core;
 
-    DataStore(LapisCorePlugin core) {
+    DataStore(JavaPlugin core) {
         this.core = core;
     }
 

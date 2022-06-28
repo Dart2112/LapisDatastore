@@ -24,7 +24,7 @@ plugins {
 
 group = 'net.lapismc'
 archivesBaseName = "LapisDataStore"
-version = '1.2.1'
+version = '1.2.2'
 description = 'An API for interfacing with SQL databases'
 sourceCompatibility = '11'
 targetCompatibility = '11'
@@ -39,12 +39,11 @@ repositories {
 }
 
 dependencies {
-    compile 'net.lapismc:LapisCore:1.8.2'
-    compile 'com.zaxxer:HikariCP:4.0.3'
-    compile 'com.h2database:h2:1.4.199'
-    compile 'org.xerial:sqlite-jdbc:3.34.0'
-    compile 'org.slf4j:slf4j-nop:1.7.30'
-    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    compile 'com.zaxxer:HikariCP:5.0.1'
+    compile 'com.h2database:h2:2.1.212'
+    compile 'org.xerial:sqlite-jdbc:3.36.0.3'
+    compile 'org.slf4j:slf4j-nop:1.7.36'
+    compileOnly 'org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT'
 }
 
 shadowJar {
@@ -77,6 +76,7 @@ artifacts {
 }
 
 signing {
+    useGpgCmd()
     sign configurations.archives
 }
 

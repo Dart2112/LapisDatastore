@@ -1,7 +1,7 @@
 package net.lapismc.datastore;
 
 import net.lapismc.datastore.util.LapisURL;
-import net.lapismc.lapiscore.LapisCorePlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.sql.SQLException;
 
 public abstract class SQLite extends MySQL {
 
-    private LapisURL url;
+    private final LapisURL url;
 
-    public SQLite(LapisCorePlugin core, LapisURL url) {
+    public SQLite(JavaPlugin core, LapisURL url) {
         super(core);
         this.url = url;
         try {

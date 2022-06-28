@@ -3,7 +3,7 @@ package net.lapismc.datastore.util;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import net.lapismc.datastore.DataStore;
-import net.lapismc.lapiscore.LapisCorePlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.h2.Driver;
 
 import java.sql.Connection;
@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionManager {
 
     private HikariDataSource ds;
-    private HikariConfig config;
-    private HikariDataSource noDB;
+    private final HikariConfig config;
+    private final HikariDataSource noDB;
 
-    public ConnectionManager(LapisCorePlugin core, LapisURL url, DataStore.StorageType type, String username, String password) {
+    public ConnectionManager(JavaPlugin core, LapisURL url, DataStore.StorageType type, String username, String password) {
         config = new HikariConfig();
         config.setPoolName(core.getName() + "-hikari");
 

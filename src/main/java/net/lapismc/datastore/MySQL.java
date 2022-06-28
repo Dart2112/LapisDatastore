@@ -2,8 +2,8 @@ package net.lapismc.datastore;
 
 import net.lapismc.datastore.util.ConnectionManager;
 import net.lapismc.datastore.util.LapisURL;
-import net.lapismc.lapiscore.LapisCorePlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,11 +17,11 @@ public abstract class MySQL extends DataStore {
     ConnectionManager connectionManager;
     LapisURL url;
 
-    MySQL(LapisCorePlugin core) {
+    MySQL(JavaPlugin core) {
         super(core);
     }
 
-    public MySQL(LapisCorePlugin core, LapisURL url, String username, String password) {
+    public MySQL(JavaPlugin core, LapisURL url, String username, String password) {
         super(core);
         this.url = url;
         connectionManager = new ConnectionManager(core, url, getStorageType(), username, password);
