@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -16,9 +17,11 @@ public abstract class SQLite extends MySQL {
         super(core);
         this.url = url;
         try {
-            Class.forName("org.sqlite.JDBC").newInstance();
+            Class.forName("org.sqlite.JDBC").getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
     }
 

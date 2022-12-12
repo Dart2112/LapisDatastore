@@ -6,9 +6,10 @@ import java.io.File;
 
 public class LapisURL {
 
-    private String location, database;
-    private Integer port;
-    private Boolean useSSL;
+    private final String location;
+    private final String database;
+    private final Integer port;
+    private final Boolean useSSL;
 
     LapisURL(String location, Integer port, String database, boolean useSSL) {
         this.location = location;
@@ -54,7 +55,7 @@ public class LapisURL {
                 url = url + (includeDatabase ? "/" + database : "") + (useSSL ? "?verifyServerCertificate=false&useSSL=true" : "?useSSL=false");
                 break;
             case H2:
-                url = url + ";TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0;";
+                url = url + ";TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0;DB_CLOSE_ON_EXIT=FALSE;";
                 break;
             case SQLite:
                 url = url + ".db";
