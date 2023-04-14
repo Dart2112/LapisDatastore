@@ -6,6 +6,7 @@ import org.h2.Driver;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -38,11 +39,12 @@ public abstract class H2 extends MySQL {
     }
 
     @Override
-    void getConnection(boolean includeDatabase) {
+    Connection getConnection(boolean includeDatabase) {
         try {
-            conn = DriverManager.getConnection(url.getURL(getStorageType(), false));
+            return DriverManager.getConnection(url.getURL(getStorageType(), false));
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
     }
 }

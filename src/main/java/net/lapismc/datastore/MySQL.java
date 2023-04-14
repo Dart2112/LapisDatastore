@@ -30,10 +30,8 @@ public abstract class MySQL extends DataStore {
     @Override
     public void initialiseDataStore() {
         try {
-            getConnection(false);
             createDatabase();
-            getConnection(true);
-            createTables(conn);
+            createTables(getConnection(true));
         } finally {
             closeConnection();
         }
@@ -44,20 +42,25 @@ public abstract class MySQL extends DataStore {
         return StorageType.MySQL;
     }
 
-    void getConnection(boolean includeDatabase) {
+    Connection getConnection(boolean includeDatabase) {
+        closeConnection();
         try {
-            closeConnection();
             conn = connectionManager.getConnection(includeDatabase);
+            while (conn.isClosed())
+                conn = connectionManager.getConnection(includeDatabase);
+            return conn;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
     @Override
     public void closeConnection() {
         try {
-            if (conn != null)
+            if (conn != null && !conn.isClosed())
                 conn.close();
+            conn = null;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -73,7 +76,7 @@ public abstract class MySQL extends DataStore {
     public void createDatabase() {
         if (getStorageType().equals(StorageType.MySQL)) {
             try {
-                Statement stmt = conn.createStatement();
+                Statement stmt = getConnection(false).createStatement();
                 stmt.execute("CREATE DATABASE IF NOT EXISTS " + url.getDatabase() + ";");
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -103,8 +106,7 @@ public abstract class MySQL extends DataStore {
                 query.append(" where ").append(primaryKey).append("='").append(primaryValue).append("'");
                 try {
                     //Execute
-                    getConnection(true);
-                    Statement stmt = conn.createStatement();
+                    Statement stmt = getConnection(true).createStatement();
                     stmt.execute(query.toString());
                     //Clean up
                     stmt.close();
@@ -130,10 +132,9 @@ public abstract class MySQL extends DataStore {
     public void addData(Table table, String values) {
         runTask(() -> {
             try {
-                getConnection(true);
                 String valuesQuery = getQuery(table.getCommaSeparatedValues());
                 String sql = "INSERT INTO " + table.getName() + "(" + table.getCommaSeparatedValues() + ") VALUES(" + valuesQuery + ")";
-                PreparedStatement preStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preStatement = getConnection(true).prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 int i = 1;
                 for (String s : values.split(valueSeparator)) {
                     preStatement.setString(i, s);
@@ -153,9 +154,8 @@ public abstract class MySQL extends DataStore {
     public void setData(Table table, String primaryKey, String primaryValue, String key, String value) {
         runTask(() -> {
             try {
-                getConnection(true);
                 String sqlUpdate = "UPDATE " + table.getName() + " SET " + key + " = ? WHERE " + primaryKey + " = ?";
-                PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
+                PreparedStatement preStatement = getConnection(true).prepareStatement(sqlUpdate);
                 preStatement.setString(1, value);
                 preStatement.setString(2, primaryValue);
                 preStatement.execute();
@@ -300,9 +300,8 @@ public abstract class MySQL extends DataStore {
     public void removeData(Table table, String key, String value) {
         runTask(() -> {
             try {
-                getConnection(true);
                 String sqlUpdate = "DELETE FROM " + table.getName() + " WHERE " + key + " = ?";
-                PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
+                PreparedStatement preStatement = getConnection(true).prepareStatement(sqlUpdate);
                 preStatement.setString(1, value);
                 preStatement.execute();
                 preStatement.close();
@@ -318,9 +317,8 @@ public abstract class MySQL extends DataStore {
     public void removeAllData(Table table) {
         runTask(() -> {
             try {
-                getConnection(true);
                 String sqlUpdate = "DELETE FROM " + table.getName();
-                Statement stmt = conn.createStatement();
+                Statement stmt = getConnection(true).createStatement();
                 stmt.execute(sqlUpdate);
                 stmt.close();
             } catch (SQLException e) {
@@ -335,9 +333,8 @@ public abstract class MySQL extends DataStore {
     protected void dropTable(Table table) {
         runTask(() -> {
             try {
-                getConnection(true);
                 String sqlUpdate = "DROP TABLE " + table.getName();
-                Statement stmt = conn.createStatement();
+                Statement stmt = getConnection(true).createStatement();
                 stmt.execute(sqlUpdate);
                 stmt.close();
             } catch (SQLException e) {
@@ -370,9 +367,8 @@ public abstract class MySQL extends DataStore {
 
     private ResultSet getResults(Table table, String primaryKey, String value) {
         try {
-            getConnection(true);
             String sqlUpdate = "SELECT * FROM " + table.getName() + " WHERE " + primaryKey + " = ?";
-            PreparedStatement preStatement = conn.prepareStatement(sqlUpdate);
+            PreparedStatement preStatement = getConnection(true).prepareStatement(sqlUpdate);
             preStatement.setString(1, value);
             return preStatement.executeQuery();
         } catch (SQLException e) {
@@ -383,8 +379,7 @@ public abstract class MySQL extends DataStore {
 
     private ResultSet getEntireTableAsResultSet(Table table) {
         try {
-            getConnection(true);
-            Statement stmt = conn.createStatement();
+            Statement stmt = getConnection(true).createStatement();
             String sql = "SELECT * FROM " + table.getName();
             return stmt.executeQuery(sql);
         } catch (SQLException e) {

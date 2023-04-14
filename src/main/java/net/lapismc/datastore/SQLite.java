@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -44,11 +45,12 @@ public abstract class SQLite extends MySQL {
     }
 
     @Override
-    void getConnection(boolean includeDatabase) {
+    Connection getConnection(boolean includeDatabase) {
         try {
-            conn = DriverManager.getConnection(url.getURL(getStorageType(), false));
+            return DriverManager.getConnection(url.getURL(getStorageType(), false));
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
     }
 }
